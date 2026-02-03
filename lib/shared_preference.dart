@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:shared_local_data/nextfile.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SimpleForm extends StatefulWidget {
   const SimpleForm({super.key});
@@ -13,6 +15,20 @@ class _SimpleFormState extends State<SimpleForm> {
   final ageController = TextEditingController();
   final heightController = TextEditingController();
   bool isLoggedIn = false;
+  //to get that data
+  String? name;
+  int? age;
+  double? height;
+  bool? islogged;
+  //dispose method
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    nameController.dispose();
+    ageController.dispose();
+    heightController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -48,15 +64,48 @@ class _SimpleFormState extends State<SimpleForm> {
                 const Text("Is Logged In?"),
                 Switch(
                   value: isLoggedIn,
-                  onChanged: (val) => setState(() => isLoggedIn = !isLoggedIn),
+                  onChanged: (val) => setState(() => isLoggedIn = val),
                 ),
               ],
             ),
             const SizedBox(height: 20),
-            ElevatedButton(onPressed: () {}, child: const Text('Show Values')),
+            ElevatedButton(
+              onPressed: () async {
+                await saveData(
+                  nameController.text,
+                  int.parse(ageController.text),
+                  double.parse(heightController.text),
+                  isLoggedIn,
+                );
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => Nextfile()),
+                );
+                nameController.clear();
+                ageController.clear();
+                heightController.clear();
+              },
+
+              child: const Text('Save Values'),
+            ),
           ],
         ),
       ),
     );
+  }
+
+  //make a sharedpreference function to store all data
+  Future<void> saveData(
+    String username,
+    int age,
+    double height,
+    bool isLogged,
+  ) async {
+    final pref = await SharedPreferences.getInstance();
+
+    await pref.setString("userName", username);
+    await pref.setInt("age", age);
+    await pref.setDouble("height", height);
+    await pref.setBool("isLogged", isLogged);
   }
 }
