@@ -12,11 +12,10 @@ class _NextfileState extends State<Nextfile> {
   String? name;
   int? age;
   double? height;
-  bool? isLoggedIn;
+
   //initstate
   @override
   void initState() {
-    // TODO: implement initState
     getData();
     super.initState();
   }
@@ -31,11 +30,27 @@ class _NextfileState extends State<Nextfile> {
             Text("Name :$name"),
             Text("Age :$age"),
             Text("height :$height"),
-            Text("Logged in :$isLoggedIn"),
           ],
         ),
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () async {
+          await clearData();
+        },
+        child: Text("Clear"),
+      ),
     );
+  }
+
+  Future<void> clearData() async {
+    final pref = await SharedPreferences.getInstance();
+    pref.clear();
+    name = null;
+    age = null;
+    height = null;
+    // islogged = null;
+
+    setState(() {});
   }
 
   //now how to get that data
@@ -44,7 +59,6 @@ class _NextfileState extends State<Nextfile> {
     name = pref.getString("userName") ?? "";
     age = pref.getInt("age") ?? 0;
     height = pref.getDouble("height") ?? 0.0;
-    isLoggedIn = pref.getBool("isLogged") ?? false;
 
     setState(() {});
   }
